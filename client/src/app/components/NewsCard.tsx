@@ -28,7 +28,7 @@ interface NewsCardProps {
 }
 
 export function NewsCard({ article, index }: NewsCardProps) {
-  const { t, isDark, isAuthenticated, isBookmarkedById, bookmarks, setBookmarks, setAccountOpen } = useApp();
+  const { t, isDark, isAuthenticated, isBookmarkedById, bookmarks, setBookmarks, setSidebarOpen } = useApp();
   const [isBookmarking, setIsBookmarking] = useState(false);
   const articleId = getArticleId(article);
   const isBookmarked = isBookmarkedById(articleId);
@@ -43,7 +43,7 @@ export function NewsCard({ article, index }: NewsCardProps) {
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      setAccountOpen(true);
+      setSidebarOpen(true);
       return;
     }
 

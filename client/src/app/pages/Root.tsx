@@ -2,7 +2,6 @@ import { Outlet } from 'react-router';
 import { useApp } from '../contexts/AppContext';
 import { Header } from '../components/Header';
 import { ProfileSidebar } from '../components/ProfileSidebar';
-import { AccountDrawer } from '../components/AccountDrawer';
 import { ScrollToTop } from '../components/ScrollToTop';
 
 export function Root() {
@@ -27,7 +26,6 @@ export function Root() {
 
       {/* Global overlays */}
       <ProfileSidebar />
-      <AccountDrawer />
       <ScrollToTop />
     </div>
   );

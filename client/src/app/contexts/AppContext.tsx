@@ -15,9 +15,6 @@ interface AppContextType {
   // Sidebar
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  // Account Drawer
-  accountOpen: boolean;
-  setAccountOpen: (open: boolean) => void;
   // Category filter
   selectedCategory: Category | 'all';
   setSelectedCategory: (cat: Category | 'all') => void;
@@ -41,7 +38,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(null);
@@ -89,8 +85,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       t,
       sidebarOpen,
       setSidebarOpen,
-      accountOpen,
-      setAccountOpen,
       selectedCategory,
       setSelectedCategory,
       searchQuery,

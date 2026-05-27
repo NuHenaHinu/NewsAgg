@@ -492,7 +492,11 @@ app.get('/bookmarks/check/:articleId', verifyToken, async (req, res) => {
     }
 });
 
-// 
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/newsagg');
 
