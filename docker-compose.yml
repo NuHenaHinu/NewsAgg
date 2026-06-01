@@ -4,20 +4,21 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-    # 直接在 environment 裡寫死地址，確保連線成功
+      - "${SERVER_HOST_PORT:-3000}:3000"
+    env_file:
+      - ./server/.env
+      - ./server/.hf.env
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: "postgresql://neondb_owner:npg_XOkmBjpty5z3@ep-silent-brook-aob7c55q.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
-      NEON_DSN: "postgresql://neondb_owner:npg_XOkmBjpty5z3@ep-silent-brook-aob7c55q.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
-      API_KEY: "" # 先留空，拿到後再填入
     restart: unless-stopped
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: "${VITE_API_URL:-http://localhost:3000}"
     ports:
       - "8080:80"
     depends_on:
