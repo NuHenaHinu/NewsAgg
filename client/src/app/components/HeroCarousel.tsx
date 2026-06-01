@@ -86,8 +86,8 @@ export function HeroCarousel() {
   return (
     <div
       className="relative overflow-hidden transition-all duration-300 ease-out rounded-2xl border shadow-lg"
-      style={{ 
-        height: `${heroHeight}px`, 
+      style={{
+        height: `${heroHeight}px`,
         overflowAnchor: 'none',
         borderColor: isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(255, 255, 255, 0.6)',
         backgroundColor: isDark ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.4)',
@@ -109,7 +109,7 @@ export function HeroCarousel() {
           <img
             src={article.urlToImage || article.images[0]?.url || 'https://via.placeholder.com/800x400?text=No+Image'}
             alt={article.title}
-            className="w-full h-full object-cover rounded-xl"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent rounded-xl" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent rounded-xl" />
