@@ -4,3 +4,4 @@ node_modules
 CLAUDE.md
 skills
 ui-ux-pro-max-skill
+.env.local

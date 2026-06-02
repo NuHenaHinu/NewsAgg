@@ -9,6 +9,7 @@ import { LiveView } from './sentiment/LiveView';
 import { TrendingKeywords } from './sentiment/TrendingKeywords';
 import { LiveEngagement } from './sentiment/LiveEngagement';
 import { DatasetStats } from './sentiment/DatasetStats';
+import { QuoteWidget } from './ui/QuoteWidget';
 
 const EMPTY_SNAPSHOT: DatasetSnapshot = {
   status: 'ok',
@@ -59,6 +60,7 @@ export function SentimentPanel() {
         snapshot={datasetSnapshot}
         categoryLabel={activeDataCategoryLabel}
       />
+      <QuoteWidget />
     </div>
   );
 }

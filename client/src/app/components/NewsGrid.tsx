@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../contexts/AppContext';
+import { matchSourceId } from '../constants';
 import { newsAPI } from '../services/newsAPI';
 import type { NewsArticle } from '../types/article';
 import { NewsCard } from './NewsCard';
@@ -10,7 +11,7 @@ import { HeroCarousel } from './HeroCarousel';
 const PER_PAGE = 9;
 
 export function NewsGrid() {
-  const { t, isDark, selectedCategory, searchQuery } = useApp();
+  const { t, isDark, selectedCategory, selectedSources, searchQuery } = useApp();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,14 @@ export function NewsGrid() {
             );
           }
 
+          // Filter by selected sources (multi-select; empty = all sources)
+          if (selectedSources.length > 0) {
+            filtered = filtered.filter((a) => {
+              const sourceId = matchSourceId(a.source);
+              return sourceId !== null && selectedSources.includes(sourceId);
+            });
+          }
+
           setArticles(filtered);
           setTotalPages(Math.max(1, Math.ceil(filtered.length / PER_PAGE)));
           setPage(1);
@@ -71,7 +80,7 @@ export function NewsGrid() {
     };
 
     fetchNews();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, selectedSources, searchQuery]);
 
   const currentArticles = showPagination
     ? articles.slice((page - 1) * PER_PAGE, page * PER_PAGE)

@@ -7,6 +7,8 @@ import { authRouter } from './routes/auth'
 import { bookmarksRouter } from './routes/bookmarks'
 import { userRouter } from './routes/user'
 import { quotesRouter } from './routes/quotes'
+import { translateRouter } from './routes/translate'
+import { chatRouter } from './routes/chat'
 import { apiLimiter, authLimiter } from './middleware/rateLimit'
 
 const app = express()
@@ -21,7 +23,9 @@ app.use(apiLimiter)
 
 // Endpoints the client uses (same contract as the retired server.js, now on 3001)
 app.use('/api/news-from-db', newsRouter)
+app.use('/api/articles', translateRouter)
 app.use('/api/quotes', quotesRouter)
+app.use('/api/chat', chatRouter)
 app.use('/api/user', userRouter)
 app.use('/auth', authLimiter, authRouter)
 app.use('/bookmarks', bookmarksRouter)

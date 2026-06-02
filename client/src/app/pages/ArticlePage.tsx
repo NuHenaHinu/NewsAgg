@@ -9,6 +9,8 @@ import { ArticleBody } from '../components/article/ArticleBody';
 import { ArticleFooter } from '../components/article/ArticleFooter';
 import { ArticleSidebar } from '../components/article/ArticleSidebar';
 import { ArticleChat } from '../components/article/ArticleChat';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
+import { useTranslate } from '../hooks/useTranslate';
 import { mutedTextClass, panelBaseClass } from '../components/article/helpers';
 import {
   getAllArticles,
@@ -84,6 +86,9 @@ export function ArticlePage() {
     return () => window.clearInterval(id);
   }, []);
 
+  // ── Translate (cache-first via backend; no-op unless translateMode is on) ──
+  const tr = useTranslate(article);
+
   const panelBase = panelBaseClass(isDark);
   const mutedText = mutedTextClass(isDark);
 
@@ -118,6 +123,16 @@ export function ArticlePage() {
     );
   }
 
+  // Apply translated text fields (when active) over the original article.
+  // Metrics/sidebar/chat keep the original article for accuracy.
+  const displayArticle: NewsArticle = {
+    ...article,
+    title: tr.title,
+    description: tr.description,
+    content: tr.content,
+    aiSummary: tr.aiSummary,
+  };
+
   // Sidebar content extracted to avoid duplication between desktop and mobile
   const sidebar = (
     <ArticleSidebar
@@ -145,9 +160,12 @@ export function ArticlePage() {
         {/* Article content */}
         <div className="flex-1 min-w-0 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="pr-2 pb-50">
+            <div className="mb-5">
+              <LanguageSwitcher isDark={isDark} isLoading={tr.isLoading} isAutoTranslated={tr.isAutoTranslated} />
+            </div>
             <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="min-w-0">
-              <ArticleHeader article={article} isDark={isDark} />
-              <ArticleBody article={article} isDark={isDark} />
+              <ArticleHeader article={displayArticle} isDark={isDark} />
+              <ArticleBody article={displayArticle} isDark={isDark} />
               <ArticleFooter article={article} isDark={isDark} />
             </motion.article>
           </div>

@@ -62,6 +62,18 @@ export interface Translations {
   filterByCountry: string;
   selectLanguage: string;
   noResults: string;
+  translating: string;
+  autoTranslated: string;
+  translateAll: string;
+  noTranslation: string;
+  quoteOfDay: string;
+  filter: string;
+  filters: string;
+  byCategory: string;
+  bySource: string;
+  allSources: string;
+  clearFilters: string;
+  sources: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -127,6 +139,18 @@ export const translations: Record<Language, Translations> = {
     filterByCountry: 'Filter by Country',
     selectLanguage: 'Language',
     noResults: 'No results found',
+    translating: 'Translating…',
+    autoTranslated: 'Auto-translated',
+    translateAll: 'Translate',
+    noTranslation: 'Translation unavailable',
+    quoteOfDay: 'Quote of the Day',
+    filter: 'Filter',
+    filters: 'Filters',
+    byCategory: 'By Category',
+    bySource: 'By Source',
+    allSources: 'All Sources',
+    clearFilters: 'Clear',
+    sources: 'Sources',
   },
   id: {
     home: 'Beranda',
@@ -190,6 +214,18 @@ export const translations: Record<Language, Translations> = {
     filterByCountry: 'Filter Berdasarkan Negara',
     selectLanguage: 'Bahasa',
     noResults: 'Tidak ada hasil',
+    translating: 'Menerjemahkan…',
+    autoTranslated: 'Terjemahan otomatis',
+    translateAll: 'Terjemahkan',
+    noTranslation: 'Terjemahan tidak tersedia',
+    quoteOfDay: 'Kutipan Hari Ini',
+    filter: 'Filter',
+    filters: 'Filter',
+    byCategory: 'Per Kategori',
+    bySource: 'Per Sumber',
+    allSources: 'Semua Sumber',
+    clearFilters: 'Hapus',
+    sources: 'Sumber',
   },
   zhCN: {
     home: '首页',
@@ -253,6 +289,18 @@ export const translations: Record<Language, Translations> = {
     filterByCountry: '按国家筛选',
     selectLanguage: '语言',
     noResults: '未找到结果',
+    translating: '翻译中…',
+    autoTranslated: '自动翻译',
+    translateAll: '翻译',
+    noTranslation: '暂无翻译',
+    quoteOfDay: '每日一句',
+    filter: '筛选',
+    filters: '筛选',
+    byCategory: '按分类',
+    bySource: '按来源',
+    allSources: '所有来源',
+    clearFilters: '清除',
+    sources: '来源',
   },
   zhTW: {
     home: '首頁',
@@ -316,5 +364,17 @@ export const translations: Record<Language, Translations> = {
     filterByCountry: '按國家篩選',
     selectLanguage: '語言',
     noResults: '未找到結果',
+    translating: '翻譯中…',
+    autoTranslated: '自動翻譯',
+    translateAll: '翻譯',
+    noTranslation: '暫無翻譯',
+    quoteOfDay: '每日一句',
+    filter: '篩選',
+    filters: '篩選',
+    byCategory: '按分類',
+    bySource: '按來源',
+    allSources: '所有來源',
+    clearFilters: '清除',
+    sources: '來源',
   },
 };
