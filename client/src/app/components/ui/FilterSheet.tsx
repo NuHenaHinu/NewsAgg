@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, LayoutGrid, Newspaper } from 'lucide-react';
+import { X, Check, LayoutGrid, Newspaper, Gauge } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { CATEGORIES, CATEGORY_LABELS, SOURCES, sourceLogoUrl } from '../../constants';
 import { ImageWithFallback } from '../utils/ImageWithFallback';
+import type { SentimentType } from '../../types/sentiment';
 
 interface FilterSheetProps {
   open: boolean;
   onClose: () => void;
 }
 
-type FilterTab = 'category' | 'source';
+type FilterTab = 'category' | 'source' | 'sentiment';
+
+const SENTIMENT_OPTIONS: SentimentType[] = ['positive', 'neutral', 'negative'];
 
 // Desktop renders an anchored dropdown, mobile a bottom sheet. The breakpoint
 // mirrors Tailwind's `md` so it stays in sync with the rest of the layout.
@@ -36,6 +39,8 @@ export function FilterSheet({ open, onClose }: FilterSheetProps) {
     setSelectedCategory,
     selectedSources,
     setSelectedSources,
+    selectedSentiment,
+    setSelectedSentiment,
   } = useApp();
   const [tab, setTab] = useState<FilterTab>('category');
   const isDesktop = useIsDesktop();
@@ -51,9 +56,19 @@ export function FilterSheet({ open, onClose }: FilterSheetProps) {
   const clearAll = () => {
     setSelectedCategory('all');
     setSelectedSources([]);
+    setSelectedSentiment('all');
   };
 
-  const activeCount = (selectedCategory !== 'all' ? 1 : 0) + selectedSources.length;
+  const activeCount =
+    (selectedCategory !== 'all' ? 1 : 0) +
+    selectedSources.length +
+    (selectedSentiment !== 'all' ? 1 : 0);
+
+  const sentimentLabel: Record<SentimentType, string> = {
+    positive: t.positive,
+    neutral: t.neutral,
+    negative: t.negative,
+  };
 
   // Shared panel body — only one variant (dropdown or sheet) mounts at a time.
   const body = (
@@ -111,6 +126,7 @@ export function FilterSheet({ open, onClose }: FilterSheetProps) {
           [
             { key: 'category', label: t.byCategory, icon: LayoutGrid },
             { key: 'source', label: t.bySource, icon: Newspaper },
+            { key: 'sentiment', label: t.bySentiment, icon: Gauge },
           ] as const
         ).map(({ key, label, icon: Icon }) => {
           const active = tab === key;
@@ -150,6 +166,25 @@ export function FilterSheet({ open, onClose }: FilterSheetProps) {
                 active={selectedCategory === cat}
                 isDark={isDark}
                 onClick={() => setSelectedCategory(cat)}
+              />
+            ))}
+          </div>
+        ) : tab === 'sentiment' ? (
+          <div className="flex flex-wrap gap-2">
+            <CategoryChip
+              label={t.allSentiment}
+              active={selectedSentiment === 'all'}
+              isDark={isDark}
+              onClick={() => setSelectedSentiment('all')}
+            />
+            {SENTIMENT_OPTIONS.map((s) => (
+              <CategoryChip
+                key={s}
+                label={sentimentLabel[s]}
+                active={selectedSentiment === s}
+                isDark={isDark}
+                tone={s}
+                onClick={() => setSelectedSentiment(s)}
               />
             ))}
           </div>
@@ -230,15 +265,24 @@ interface CategoryChipProps {
   active: boolean;
   isDark: boolean;
   onClick: () => void;
+  // Optional semantic tone for sentiment chips; defaults to the indigo accent.
+  tone?: SentimentType;
 }
 
-function CategoryChip({ label, active, isDark, onClick }: CategoryChipProps) {
+const TONE_ACTIVE_CLASS: Record<SentimentType, string> = {
+  positive: 'bg-emerald-500 text-white',
+  neutral: 'bg-amber-500 text-white',
+  negative: 'bg-rose-500 text-white',
+};
+
+function CategoryChip({ label, active, isDark, onClick, tone }: CategoryChipProps) {
+  const activeClass = tone ? TONE_ACTIVE_CLASS[tone] : 'bg-indigo-500 text-white';
   return (
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
         active
-          ? 'bg-indigo-500 text-white'
+          ? activeClass
           : isDark
           ? 'bg-slate-700/60 text-slate-200 hover:bg-slate-700'
           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

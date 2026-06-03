@@ -24,3 +24,24 @@ export async function fetchDailyQuote(): Promise<DailyQuote | null> {
     return null;
   }
 }
+
+/**
+ * Fetch a batch of quotes from the backend (GET /api/quotes/list) for the
+ * client-side 7s rotation. Returns [] on any failure so the widget can fall
+ * back to the single daily quote rather than render a broken card.
+ */
+export async function fetchQuoteList(): Promise<DailyQuote[]> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/quotes/list`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    if (json?.success && Array.isArray(json.data)) {
+      return (json.data as Array<{ quote?: string; author?: string }>)
+        .map((item) => ({ quote: item.quote || '', author: item.author || 'Unknown' }))
+        .filter((item) => item.quote.length > 0);
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}

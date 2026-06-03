@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { motion } from 'motion/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Newspaper } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { TOPIC_TO_CATEGORY } from '../constants';
 import { ArticleHeader } from '../components/article/ArticleHeader';
@@ -96,8 +96,11 @@ export function ArticlePage() {
     return (
       <div className="px-4 md:px-6 py-6 max-w-6xl mx-auto">
         <div className={`flex flex-col items-center justify-center py-20 ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>
-          <div className="animate-spin text-3xl mb-4">Loading</div>
-          <p className="text-lg font-medium">Loading article...</p>
+          <div
+            className={`w-10 h-10 rounded-full border-[3px] border-t-transparent animate-spin mb-4 ${isDark ? 'border-cyan-400/70' : 'border-cyan-500/70'}`}
+            aria-label={t.loading}
+          />
+          <p className="text-lg font-medium">{t.loading || 'Loading article...'}</p>
         </div>
       </div>
     );
@@ -112,7 +115,7 @@ export function ArticlePage() {
           </button>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`text-center py-20 rounded-2xl border ${panelBase}`}>
-          <div className="text-6xl mb-4">News</div>
+          <Newspaper size={56} className={`mx-auto mb-4 ${isDark ? 'text-slate-600' : 'text-gray-300'}`} />
           <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-slate-100' : 'text-gray-900'}`}>Article Not Found</h2>
           <p className={`mb-6 ${mutedText}`}>{error}</p>
           <Link to="/" className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all">

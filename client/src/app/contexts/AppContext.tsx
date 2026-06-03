@@ -5,6 +5,7 @@ import { User } from '../services/authService';
 import { Bookmark, bookmarkService } from '../services/bookmarkService';
 import { getRandomQuote } from '../services/newsAPI';
 import type { DailyQuote } from '../types/api';
+import type { SentimentType } from '../types/sentiment';
 import { mem0Service } from '../services/mem0Service';
 
 interface AppContextType {
@@ -27,6 +28,9 @@ interface AppContextType {
   // Source filter (e.g. ['cnn', 'bbc', 'aljazeera', 'yahoo_tw'])
   selectedSources: string[];
   setSelectedSources: (s: string[]) => void;
+  // Sentiment filter (positive | neutral | negative | 'all')
+  selectedSentiment: SentimentType | 'all';
+  setSelectedSentiment: (s: SentimentType | 'all') => void;
   // Search
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -34,6 +38,10 @@ interface AppContextType {
   user: User | null;
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
+  // Avatar (user-set profile picture, persisted per-account in localStorage)
+  avatarUrl: string | null;
+  setAvatarUrl: (url: string | null) => void;
+  avatarSrc: string;            // effective src: custom avatar, else generated fallback
   // Bookmarks
   bookmarks: Bookmark[];
   setBookmarks: (bookmarks: Bookmark[]) => void;
@@ -56,8 +64,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [selectedSentiment, setSelectedSentiment] = useState<SentimentType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<User | null>(null);
+  const [avatarUrl, setAvatarUrlState] = useState<string | null>(null);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [quote, setQuote] = useState<DailyQuote | null>(null);
   const [preferences, setPreferences] = useState<string[]>([]);
@@ -107,9 +117,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  // Load the saved avatar for whichever account is signed in (keyed by email so
+  // switching accounts on the same browser doesn't leak avatars between them).
+  useEffect(() => {
+    setAvatarUrlState(user ? localStorage.getItem(`avatar:${user.email}`) : null);
+  }, [user]);
+
+  const setAvatarUrl = (url: string | null) => {
+    setAvatarUrlState(url);
+    if (!user) return;
+    const key = `avatar:${user.email}`;
+    if (url) localStorage.setItem(key, url);
+    else localStorage.removeItem(key);
+  };
+
   const toggleTheme = () => setIsDark(prev => !prev);
   const t = translations[language];
   const isAuthenticated = !!user;
+  const avatarSrc =
+    avatarUrl ||
+    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.username || 'NewsAgg2026')}`;
 
   const isBookmarkedById = (articleId: string) =>
     bookmarks.some(b => b.article_id === articleId);
@@ -134,11 +161,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSelectedCategory,
       selectedSources,
       setSelectedSources,
+      selectedSentiment,
+      setSelectedSentiment,
       searchQuery,
       setSearchQuery,
       user,
       isAuthenticated,
       setUser,
+      avatarUrl,
+      setAvatarUrl,
+      avatarSrc,
       bookmarks,
       setBookmarks,
       isBookmarkedById,

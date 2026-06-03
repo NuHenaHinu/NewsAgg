@@ -7,7 +7,7 @@ import { Language } from '../i18n/translations';
 import { FilterSheet } from './ui/FilterSheet';
 
 export function Header() {
-  const { t, isDark, toggleTheme, language, setLanguage, setSidebarOpen, searchQuery, setSearchQuery, selectedCategory, selectedSources, user, bookmarks } = useApp();
+  const { t, isDark, toggleTheme, language, setLanguage, setSidebarOpen, searchQuery, setSearchQuery, selectedCategory, selectedSources, selectedSentiment, user, bookmarks, avatarSrc } = useApp();
   const navigate = useNavigate();
   const [filterOpen, setFilterOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -37,7 +37,10 @@ export function Header() {
     { code: 'zhTW', label: t.zhTraditional },
   ];
 
-  const filterActiveCount = (selectedCategory !== 'all' ? 1 : 0) + selectedSources.length;
+  const filterActiveCount =
+    (selectedCategory !== 'all' ? 1 : 0) +
+    selectedSources.length +
+    (selectedSentiment !== 'all' ? 1 : 0);
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-4 md:px-6 gap-3 border-b backdrop-blur-xl transition-colors duration-300 ${isDark ? 'bg-slate-900/90 border-slate-700/50' : 'bg-white/85 border-white/50'}`}>
@@ -48,7 +51,7 @@ export function Header() {
           className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-transform hover:scale-105 active:scale-95 flex-shrink-0 ${isDark ? 'border-cyan-400' : 'border-cyan-500'}`}
           aria-label="Open profile"
         >
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=NewsAgg2026" alt="Avatar" className="w-full h-full object-cover bg-gradient-to-br from-cyan-400 to-pink-400" />
+          <img src={avatarSrc} alt="Avatar" className="w-full h-full object-cover bg-gradient-to-br from-cyan-400 to-pink-400" />
         </button>
         <Link to="/" className="flex-shrink-0">
           <span className="font-poppins text-xl font-bold bg-gradient-to-r from-cyan-500 to-pink-500 bg-clip-text text-transparent">

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { bookmarkService } from '../services/bookmarkService';
 import { Link } from 'react-router';
-import { Clock3, Bookmark, AlertCircle } from 'lucide-react';
+import { Bookmark, AlertCircle } from 'lucide-react';
 
 export function BookmarksPage() {
-  const { user, isDark, t, bookmarks, setBookmarks } = useApp();
+  const { user, isDark, bookmarks, setBookmarks } = useApp();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

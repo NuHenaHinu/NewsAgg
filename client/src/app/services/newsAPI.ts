@@ -517,6 +517,35 @@ const paginateArticles = (articles: NewsArticle[], pageSize: number, page: numbe
   return articles.slice(startIndex, startIndex + safePageSize);
 };
 
+// ─── Headline ranking ─────────────────────────────────────────────────────────
+//
+// "Top headlines" means the most intense / discussed stories, not merely the
+// newest. The score blends how strongly non-neutral the article reads, the
+// model's confidence, and recency (product decision):
+//   score = 0.5 * sentimentIntensity + 0.3 * aiConfidence + 0.2 * recency
+// recency is min/max-normalised across the input set so it stays comparable
+// regardless of how old the dataset is.
+const rankByImportance = (articles: NewsArticle[]): NewsArticle[] => {
+  if (articles.length === 0) return [];
+
+  const times = articles
+    .map((article) => new Date(article.publishedAt).getTime())
+    .filter((time) => !Number.isNaN(time));
+  const minTime = times.length > 0 ? Math.min(...times) : 0;
+  const maxTime = times.length > 0 ? Math.max(...times) : 0;
+  const span = maxTime - minTime;
+
+  const scoreOf = (article: NewsArticle): number => {
+    const intensity = Math.abs(clampSignedUnit(article.sentiment.comparative));
+    const aiConfidence = clampUnit(article.aiConfidence ?? 0);
+    const timestamp = new Date(article.publishedAt).getTime();
+    const recencyNorm = span > 0 && !Number.isNaN(timestamp) ? (timestamp - minTime) / span : 1;
+    return 0.5 * intensity + 0.3 * aiConfidence + 0.2 * recencyNorm;
+  };
+
+  return [...articles].sort((left, right) => scoreOf(right) - scoreOf(left));
+};
+
 const buildSuccessResponse = (
   articles: NewsArticle[],
   status: string,
@@ -597,6 +626,19 @@ export const getLatestArticles = async (
 ): Promise<NewsArticle[]> => {
   const { articles } = await getStore();
   return filterByCategory(articles, category).slice(0, Math.max(0, limit));
+};
+
+/**
+ * Top headlines ranked by importance (intensity + AI confidence + recency)
+ * rather than pure recency. Used by the Top Headlines page; defaults to 10.
+ */
+export const getRankedHeadlines = async (
+  limit = 10,
+  category: NewsCategoryFilter = 'all'
+): Promise<NewsArticle[]> => {
+  const { articles } = await getStore();
+  const filtered = filterByCategory(articles, category);
+  return rankByImportance(filtered).slice(0, Math.max(0, limit));
 };
 
 export const getTrendingKeywords = async (

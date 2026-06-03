@@ -8,12 +8,6 @@ interface ArticleSentimentPanelProps {
     isDark: boolean;
 }
 
-const SENTIMENT_TEXT_STYLE: Record<SentimentType, string> = {
-    positive: 'text-emerald-600',
-    neutral: 'text-gray-600',
-    negative: 'text-red-600',
-};
-
 const PROBABILITY_STYLE: Record<SentimentType, { bar: string; text: string }> = {
     positive: {
         bar: 'bg-emerald-500',
@@ -33,8 +27,6 @@ const clampUnit = (value: number): number => Math.max(0, Math.min(1, value));
 
 const clampSignedUnit = (value: number): number => Math.max(-1, Math.min(1, value));
 
-const formatSignedValue = (value: number): string => `${value >= 0 ? '+' : ''}${value.toFixed(4)}`;
-
 export function ArticleSentimentPanel({ article, isDark }: ArticleSentimentPanelProps) {
     const { t } = useApp();
 
@@ -47,7 +39,6 @@ export function ArticleSentimentPanel({ article, isDark }: ArticleSentimentPanel
 
     const confidence = clampUnit(article.sentiment.score);
     const comparative = clampSignedUnit(article.sentiment.comparative);
-    const sentimentClass = SENTIMENT_TEXT_STYLE[article.sentiment.type];
 
     const rawProbabilities = article.sentiment.probabilities;
     const positive = clampUnit(rawProbabilities.positive);
@@ -80,12 +71,13 @@ export function ArticleSentimentPanel({ article, isDark }: ArticleSentimentPanel
             </h3>
 
             <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                    <span className={`text-sm font-semibold ${sentimentClass}`}>{t[article.sentiment.type]}</span>
-                    <span className={`text-sm font-semibold ${sentimentClass}`}>{formatSignedValue(comparative)}</span>
-                </div>
-
-                <GradientBarWithPointer value={comparative} height={22} pointerSize={18} className="my-1" />
+                <GradientBarWithPointer
+                    value={comparative}
+                    label={t[article.sentiment.type]}
+                    height={22}
+                    pointerSize={18}
+                    className="my-1"
+                />
 
                 <p className={`text-xs ${mutedText}`}>
                     Confidence: {(confidence * 100).toFixed(1)}%

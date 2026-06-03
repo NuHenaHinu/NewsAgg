@@ -37,9 +37,9 @@ export function HeroCarousel() {
   useEffect(() => {
     const fetchHeadlines = async () => {
       try {
-        const response = await newsAPI.getTopHeadlines('all', 5);
+        const response = await newsAPI.getTopHeadlines('all', 10);
         if (response.success && response.data?.articles) {
-          setHeadlines(response.data.articles.slice(0, 5));
+          setHeadlines(response.data.articles.slice(0, 10));
         }
       } catch (err) {
         console.error('Failed to fetch headlines:', err);

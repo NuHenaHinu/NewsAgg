@@ -6,9 +6,11 @@ import { Pool } from 'pg'
 const connectionString =
   process.env.NEONDB_URL || process.env.DATABASE_URL || process.env.NEON_DSN
 
+const isLocal = connectionString?.includes('@db:') || connectionString?.includes('localhost') || connectionString?.includes('127.0.0.1')
+
 export const pool = new Pool({
   connectionString,
-  ssl: { rejectUnauthorized: false }
+  ssl: isLocal ? false : { rejectUnauthorized: false }
 })
 
 export async function query(text: string, params?: any[]) {

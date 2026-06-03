@@ -77,25 +77,30 @@ export function ArticleChat({ article, isDark }: ArticleChatProps) {
 
   return (
     <>
-      {/* Floating trigger */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full text-sm font-semibold text-white shadow-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transition-all"
-      >
-        <Sparkles size={16} />Ask AI
-      </button>
+      {/* Floating trigger (hidden while the panel is open) */}
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full text-sm font-semibold text-white shadow-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transition-all"
+        >
+          <Sparkles size={16} />Ask AI
+        </button>
+      )}
 
       <AnimatePresence>
         {open && (
           <>
+            {/* Mobile-only dimmer: on small screens the panel covers most of the
+                width, so a tap-to-close scrim helps. Desktop stays scrim-free so
+                the article keeps scrolling behind the docked panel. */}
             <motion.div
               key="chat-overlay"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+              className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
             />
             <motion.aside
               key="chat-panel"
@@ -103,7 +108,7 @@ export function ArticleChat({ article, isDark }: ArticleChatProps) {
               animate={{ x: 0 }}
               exit={{ x: 360 }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className={`fixed top-0 right-0 z-50 h-full w-full max-w-sm flex flex-col border-l shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700/60' : 'bg-white border-gray-100'}`}
+              className={`fixed top-16 right-0 z-40 h-[calc(100vh-4rem)] w-full max-w-sm flex flex-col border-l shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700/60' : 'bg-white border-gray-100'}`}
             >
               <div className={`flex items-center justify-between gap-2 px-4 py-3 border-b ${isDark ? 'border-slate-700/60' : 'border-gray-100'}`}>
                 <div className="flex items-center gap-2 min-w-0">
