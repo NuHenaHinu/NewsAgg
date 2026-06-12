@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
-import { CATEGORIES, CATEGORY_LABELS, type Category } from '../../constants';
+import { CATEGORIES, CATEGORY_BADGE_CLASS, CATEGORY_LABELS, type Category } from '../../constants';
 import { FilterSheet } from '../ui/FilterSheet';
 
 /** Sticky header of the centre column: horizontally scrollable category chips
@@ -17,24 +17,44 @@ export function FeedHeader() {
   } = useApp();
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
+  const chipsRef = useRef<HTMLDivElement>(null);
+
+  // The chips row hides its scrollbar, so a mouse wheel must scroll it
+  // horizontally. Native listener: React registers wheel as passive, which
+  // would ignore preventDefault and scroll the page instead.
+  useEffect(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (el.scrollWidth <= el.clientWidth) return;
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (delta === 0) return;
+      el.scrollLeft += delta;
+      e.preventDefault();
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   const filterActiveCount =
     selectedSources.length + (selectedSentiment !== 'all' ? 1 : 0);
 
   const chip = (key: Category | 'all', label: string) => {
     const active = selectedCategory === key;
+    // Active chips wear their category colour; 'all' wears the brand gradient.
+    const activeClass = key === 'all' ? 'text-white' : `${CATEGORY_BADGE_CLASS[key]}`;
     return (
       <button
         key={key}
         onClick={() => setSelectedCategory(key)}
         className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
           active
-            ? 'text-white'
+            ? activeClass
             : isDark
               ? 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
         }`}
-        style={active ? { background: 'var(--accent, #6366f1)' } : undefined}
+        style={active && key === 'all' ? { background: 'var(--brand-grad, #06b6d4)' } : undefined}
       >
         {label}
       </button>
@@ -48,7 +68,11 @@ export function FeedHeader() {
       }`}
     >
       <div className="flex items-center gap-2">
-        <div className="flex-1 min-w-0 flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        <div
+          ref={chipsRef}
+          className="flex-1 min-w-0 flex gap-2 overflow-x-auto overscroll-x-contain"
+          style={{ scrollbarWidth: 'none' }}
+        >
           {chip('all', t.allCategories)}
           {CATEGORIES.map((c) => chip(c, CATEGORY_LABELS[c]))}
         </div>
@@ -59,7 +83,7 @@ export function FeedHeader() {
             aria-label={t.filter}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               filterActiveCount > 0
-                ? 'text-[var(--accent,#6366f1)]'
+                ? 'text-[var(--brand,#06b6d4)]'
                 : isDark
                   ? 'text-slate-300 hover:bg-slate-800'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -67,7 +91,7 @@ export function FeedHeader() {
           >
             <SlidersHorizontal size={16} />
             {filterActiveCount > 0 && (
-              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-white text-[11px] font-bold" style={{ background: 'var(--accent, #6366f1)' }}>
+              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-white text-[11px] font-bold" style={{ background: 'var(--brand, #06b6d4)' }}>
                 {filterActiveCount}
               </span>
             )}

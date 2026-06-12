@@ -20,6 +20,13 @@ export const chatLimiter = rateLimit({
   message: { success: false, message: 'Too many chat requests — try again later' }
 })
 
+// Post creation is the only spam-prone write; likes/deletes stay on apiLimiter.
+export const postLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: 'Too many posts — try again later', error: 'Too many posts — try again later' }
+})
+
 export const translateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,

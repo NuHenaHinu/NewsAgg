@@ -9,6 +9,8 @@ import { articlesRouter } from './routes/articles'
 import { marketsRouter } from './routes/markets'
 import { statsRouter } from './routes/stats'
 import { authRouter } from './routes/auth'
+import { accountRouter } from './routes/account'
+import { postsRouter } from './routes/posts'
 import { bookmarksRouter } from './routes/bookmarks'
 import { userRouter } from './routes/user'
 import { quotesRouter } from './routes/quotes'
@@ -41,6 +43,8 @@ app.use('/api/stats', statsRouter)
 app.use('/api/quotes', quotesRouter)
 app.use('/api/chat', chatLimiter, chatRouter)
 app.use('/api/user', userRouter)
+app.use('/api/account', accountRouter)
+app.use('/api/posts', postsRouter)
 app.use('/auth', authLimiter, authRouter)
 app.use('/bookmarks', bookmarksRouter)
 

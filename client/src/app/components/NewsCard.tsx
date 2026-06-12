@@ -1,9 +1,9 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Clock3, PlayCircle, ShieldAlert, Sparkles, Bookmark } from 'lucide-react';
+import { Clock3, MessageSquareQuote, PlayCircle, ShieldAlert, Sparkles, Bookmark } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useBookmarks } from '../hooks/useBookmarks';
-import { CATEGORY_BADGE_CLASS, TOPIC_TO_CATEGORY } from '../constants';
+import { CATEGORY_BADGE_CLASS, POSTS_ENABLED, TOPIC_TO_CATEGORY } from '../constants';
 import { getArticleId } from '../services/newsAPI';
 import type { NewsArticle } from '../types/article';
 import type { SentimentType } from '../types/sentiment';
@@ -31,7 +31,14 @@ interface NewsCardProps {
 export function NewsCard({ article, index }: NewsCardProps) {
   const { t, isDark, isAuthenticated, setSidebarOpen } = useApp();
   const { isBookmarked: isArticleBookmarked, bookmarkIdFor, add, remove } = useBookmarks();
+  const navigate = useNavigate();
   const articleId = getArticleId(article);
+
+  const handleQuoteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/posts?compose=1&attach=${articleId}`);
+  };
   const isBookmarked = isArticleBookmarked(articleId);
   const isBookmarking = add.isPending || remove.isPending;
   const sentiment = article.sentiment.type;
@@ -94,6 +101,17 @@ export function NewsCard({ article, index }: NewsCardProps) {
                 >
                   <Bookmark size={16} fill={isBookmarked ? 'currentColor' : 'none'} />
                 </button>
+
+                {POSTS_ENABLED && (
+                  <button
+                    onClick={handleQuoteClick}
+                    aria-label={t.quoteThis}
+                    title={t.quoteThis}
+                    className="inline-flex items-center justify-center p-2 rounded-full transition-all backdrop-blur-sm bg-black/40 text-white hover:bg-black/60"
+                  >
+                    <MessageSquareQuote size={16} />
+                  </button>
+                )}
 
                 {article.videoUrl && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">

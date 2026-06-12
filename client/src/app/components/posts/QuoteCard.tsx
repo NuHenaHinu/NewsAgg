@@ -16,10 +16,10 @@ export function QuoteCard({ quote, pinned = false }: QuoteCardProps) {
     <div
       className={`rounded-2xl border p-4 ${
         isDark ? 'bg-slate-900/70 border-slate-800' : 'bg-white border-slate-200'
-      } ${pinned ? 'border-l-4 border-l-[var(--accent,#6366f1)]' : ''}`}
+      } ${pinned ? 'border-l-4 border-l-[var(--brand,#06b6d4)]' : ''}`}
     >
       <div className="flex items-center gap-1.5 mb-2">
-        <QuoteIcon size={12} className="text-[var(--accent,#6366f1)]" />
+        <QuoteIcon size={12} className="text-[var(--brand,#06b6d4)]" />
         <span className={`text-[10px] font-mono uppercase tracking-wide ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
           {pinned ? t.quoteOfDay : 'FavQs'}
         </span>

@@ -23,7 +23,7 @@ const MarketsWidget = lazy(() =>
 
 export function RightRail() {
   const { t, isDark, selectedCategory } = useApp();
-  const [tab, setTab] = useState<RailTab>('pulse');
+  const [tab, setTab] = useState<RailTab>('insights');
 
   const tabButton = (key: RailTab, label: string) => (
     <button
@@ -36,14 +36,14 @@ export function RightRail() {
             ? 'text-slate-400 hover:text-slate-200'
             : 'text-slate-500 hover:text-slate-800'
       }`}
-      style={tab === key ? { background: 'var(--accent, #6366f1)' } : undefined}
+      style={tab === key ? { background: 'var(--brand-grad, #06b6d4)' } : undefined}
     >
       {label}
     </button>
   );
 
   return (
-    <aside className="hidden lg:block w-[300px] xl:w-[360px] shrink-0">
+    <aside className="hidden lg:block flex-1 min-w-[300px] max-w-[560px]">
       <div className="sticky top-0 h-screen flex flex-col gap-3 px-4 py-4 overflow-hidden">
         <SearchBox />
 
@@ -60,8 +60,8 @@ export function RightRail() {
           }`}
           role="tablist"
         >
-          {tabButton('pulse', t.pulse)}
           {tabButton('insights', t.insights)}
+          {tabButton('pulse', t.pulse)}
         </div>
 
         <div

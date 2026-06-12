@@ -65,7 +65,7 @@ export function BusinessTrendChart() {
               yAxisId="count"
               dataKey="articles"
               name={t.articlesPerDay}
-              fill="var(--accent, #6366f1)"
+              fill="var(--brand, #06b6d4)"
               opacity={0.75}
               radius={[3, 3, 0, 0]}
             />

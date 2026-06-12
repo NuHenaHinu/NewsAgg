@@ -60,8 +60,8 @@ export function NewsGrid() {
     return (
       <div className={`flex flex-col items-center justify-center py-20 text-center ${isDark ? 'text-red-400' : 'text-red-500'}`}>
         <div className="text-5xl mb-4">⚠️</div>
-        <p className="text-lg font-medium">Error</p>
-        <p className="text-sm mt-1">Failed to fetch news. Please check your connection.</p>
+        <p className="text-lg font-medium">{t.errorTitle}</p>
+        <p className="text-sm mt-1">{t.fetchFailed}</p>
       </div>
     );
   }
@@ -71,20 +71,24 @@ export function NewsGrid() {
       <div className={`flex flex-col items-center justify-center py-20 text-center ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>
         <div className="text-5xl mb-4">📰</div>
         <p className="text-lg font-medium">{t.noResults}</p>
-        <p className="text-sm mt-1">Try a different search or category</p>
+        <p className="text-sm mt-1">{t.tryDifferent}</p>
       </div>
     );
   }
 
   return (
     <div className="w-full overflow-x-hidden">
-      {/* Hero Carousel */}
-      <div className="mb-8 overflow-hidden">
-        <HeroCarousel />
-      </div>
+      {/* Hero Carousel — hidden while searching (raw query so it reacts on the
+          first keystroke; results are about the search, not top headlines). */}
+      {searchQuery.trim().length === 0 && (
+        <div className="mb-8 overflow-hidden">
+          <HeroCarousel />
+        </div>
+      )}
 
-      {/* Single-column feed (X-style centre column) */}
-      <div className="grid grid-cols-1 gap-5 overflow-x-hidden">
+      {/* Feed: single column in the X-style centre; two columns once the
+          full-bleed centre grows past ~900px (viewport ≥1600px). */}
+      <div className="grid grid-cols-1 min-[1600px]:grid-cols-2 gap-5 overflow-x-hidden">
         {articles.map((article, i) => (
           <NewsCard key={article.id || article.url} article={article} index={i} />
         ))}

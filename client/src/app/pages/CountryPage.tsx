@@ -22,7 +22,7 @@ export function CountryPage() {
 
   const articles = sources.length > 0 ? data?.articles ?? [] : [];
   const loading = sources.length > 0 && isLoading;
-  const error = isError ? 'Failed to fetch headlines. Please try again later.' : null;
+  const error = isError ? t.fetchFailed : null;
 
   if (loading) {
     return (
@@ -40,7 +40,7 @@ export function CountryPage() {
       <div className="px-4 md:px-6 py-6 max-w-[1600px] mx-auto">
         <div className={`flex flex-col items-center justify-center py-20 text-center ${isDark ? 'text-red-400' : 'text-red-500'}`}>
           <div className="text-5xl mb-4">⚠️</div>
-          <p className="text-lg font-medium">Error</p>
+          <p className="text-lg font-medium">{t.errorTitle}</p>
           <p className="text-sm mt-1">{error}</p>
         </div>
       </div>
@@ -59,7 +59,7 @@ export function CountryPage() {
         </div>
         <div>
           <h1 className={`font-poppins font-bold ${isDark ? 'text-slate-100' : 'text-gray-900'}`}>
-            {country?.name || iso?.toUpperCase()} News
+            {country?.name || iso?.toUpperCase()} {t.newsLabel}
           </h1>
           <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{t.filterByCountry}</p>
         </div>

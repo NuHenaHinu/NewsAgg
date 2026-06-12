@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Home, TrendingUp, MessageSquareQuote, Bookmark } from 'lucide-react';
+import { Home, MessageSquareQuote, Bookmark } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { POSTS_ENABLED } from '../../constants';
 
@@ -10,7 +10,6 @@ export function BottomTabBar() {
 
   const items = [
     { to: '/', icon: Home, label: t.home },
-    { to: '/top-headlines', icon: TrendingUp, label: t.topHeadlines },
     ...(POSTS_ENABLED ? [{ to: '/posts', icon: MessageSquareQuote, label: t.posts }] : []),
     { to: '/bookmarks', icon: Bookmark, label: t.bookmarks },
   ];
@@ -30,7 +29,7 @@ export function BottomTabBar() {
           className={({ isActive }) =>
             `flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors ${
               isActive
-                ? 'text-[var(--accent,#6366f1)]'
+                ? 'text-[var(--brand,#06b6d4)]'
                 : isDark
                   ? 'text-slate-400'
                   : 'text-slate-500'

@@ -22,12 +22,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, {});
 
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] min-h-screen items-stretch">
+    // Full-bleed: NavRail hugs the left edge, RightRail grows to the right
+    // edge (flex-1 in RightRail.tsx) — no dead gutters around the shell.
+    <div className="flex w-full min-h-screen items-stretch">
       <NavRail />
 
       <main
-        className={`flex-1 min-w-0 w-full mx-auto border-x border-transparent md:border-slate-200 dark:md:border-slate-800 ${
-          handle.wide ? 'max-w-[1050px]' : 'max-w-[760px]'
+        className={`flex-1 min-w-0 w-full md:border-slate-200 dark:md:border-slate-800 ${
+          handle.wide
+            ? 'max-w-[1050px] mx-auto md:border-x'
+            : 'md:border-r' // fills the space between NavRail and RightRail — no gaps
         } pb-16 md:pb-0`}
       >
         <TopBar />

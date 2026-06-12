@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { Language, translations, Translations } from '../i18n/translations';
 import { Category } from '../constants';
-import { User } from '../services/authService';
+import { User, authService } from '../services/authService';
 import { AUTH_UNAUTHORIZED_EVENT } from '../lib/apiFetch';
 import type { SentimentType } from '../types/sentiment';
 
@@ -74,7 +74,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('language', language);
   }, [language]);
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount, then validate the token against
+  // /api/account/me — a stale/revoked token signs out via the 401 event, a
+  // valid one refreshes the profile (username/avatar) from the server.
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -84,7 +86,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
         console.error('Error loading user from localStorage:', err);
       }
     }
+    if (!localStorage.getItem('authToken')) return;
+    authService.me().then((res) => {
+      if (res.success && res.user) {
+        setUser(res.user);
+        authService.setUser(res.user);
+      }
+    });
   }, []);
+
+  // One-time migration: avatars used to live only in this browser's
+  // localStorage; push the local copy to the server once, then drop it.
+  useEffect(() => {
+    if (!user) return;
+    const key = `avatar:${user.email}`;
+    const local = localStorage.getItem(key);
+    if (!local || user.avatar) {
+      if (local && user.avatar) localStorage.removeItem(key);
+      return;
+    }
+    authService.updateAvatar(local).then((res) => {
+      if (res.success) {
+        localStorage.removeItem(key);
+        setUser((prev) => (prev ? { ...prev, avatar: res.avatar ?? local } : prev));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email]);
 
   // Expired/revoked token detected by apiFetch -> drop the in-memory user.
   useEffect(() => {
@@ -110,7 +138,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => setIsDark((prev) => !prev);
   const t = translations[language];
   const isAuthenticated = !!user;
+  // Server-stored avatar wins; the localStorage copy only bridges the
+  // one-time migration; dicebear is the generated fallback.
   const avatarSrc =
+    user?.avatar ||
     avatarUrl ||
     `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.username || 'NewsAgg2026')}`;
 

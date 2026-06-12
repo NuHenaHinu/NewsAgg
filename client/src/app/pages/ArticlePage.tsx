@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { motion } from 'motion/react';
 import { ArrowLeft, Newspaper } from 'lucide-react';
@@ -12,19 +12,11 @@ import { ArticleChat } from '../components/article/ArticleChat';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 import { useTranslate } from '../hooks/useTranslate';
 import { useArticle } from '../hooks/useArticle';
+import { useStatsOverview, useTrendingStats } from '../hooks/useStats';
+import { useLatestArticles } from '../hooks/useArticles';
 import { mutedTextClass, panelBaseClass } from '../components/article/helpers';
-import {
-  getAllArticles,
-  getLiveEngagement,
-  getSentimentDistribution,
-  getTrendingKeywords,
-} from '../services/newsAPI';
-import type {
-  NewsArticle,
-  NewsCategoryFilter,
-  TrendingKeyword,
-  LiveEngagementItem,
-} from '../types/article';
+import { buildLiveEngagement } from '../services/newsAPI';
+import type { NewsArticle, NewsCategoryFilter } from '../types/article';
 import type { SentimentDistributionItem } from '../types/sentiment';
 
 export function ArticlePage() {
@@ -43,12 +35,6 @@ export function ArticlePage() {
 
   const [tick, setTick] = useState(Date.now());
 
-  // ── Async sidebar data (legacy store — migrates to stats hooks in F5) ─────
-  const [categorySentimentDistribution, setCategorySentimentDistribution] = useState<SentimentDistributionItem[]>([]);
-  const [categoryArticles, setCategoryArticles] = useState<NewsArticle[]>([]);
-  const [categoryTrendingKeywords, setCategoryTrendingKeywords] = useState<TrendingKeyword[]>([]);
-  const [categoryLiveEngagement, setCategoryLiveEngagement] = useState<LiveEngagementItem[]>([]);
-
   const handleBackToHome = () => {
     const historyIndex = window.history.state?.idx ?? 0;
     if (historyIndex > 0) { navigate(-1); return; }
@@ -58,19 +44,28 @@ export function ArticlePage() {
   // ── Derive category once article is loaded ────────────────────────────────
   const articleCategory: NewsCategoryFilter = article ? TOPIC_TO_CATEGORY[article.topic] : 'all';
 
-  // ── Fetch sidebar data when article category is known ─────────────────────
-  useEffect(() => {
-    if (!article) return;
-    getSentimentDistribution(articleCategory).then(setCategorySentimentDistribution);
-    getAllArticles(articleCategory).then(setCategoryArticles);
-    getTrendingKeywords(8, articleCategory).then(setCategoryTrendingKeywords);
-  }, [articleCategory, article]);
+  // ── Sidebar data: the SAME data layer as the main page (stats endpoints +
+  // cheap paginated articles, shared React Query cache) — no legacy store. ──
+  const { data: overview } = useStatsOverview(articleCategory);
+  const { data: trendingKeywords } = useTrendingStats(8, articleCategory);
+  const { data: latestPage } = useLatestArticles({ limit: 12, category: articleCategory });
 
-  // ── Fetch live engagement on tick ─────────────────────────────────────────
-  useEffect(() => {
-    if (!article) return;
-    getLiveEngagement(tick, 6, articleCategory).then(setCategoryLiveEngagement);
-  }, [tick, articleCategory, article]);
+  const categoryArticles = useMemo(() => latestPage?.articles ?? [], [latestPage]);
+  const categorySentimentDistribution = useMemo<SentimentDistributionItem[]>(
+    () =>
+      overview
+        ? [
+            { type: 'positive', count: overview.sentiments.positive },
+            { type: 'neutral', count: overview.sentiments.neutral },
+            { type: 'negative', count: overview.sentiments.negative },
+          ]
+        : [],
+    [overview]
+  );
+  const categoryLiveEngagement = useMemo(
+    () => buildLiveEngagement(categoryArticles, tick, 6),
+    [categoryArticles, tick]
+  );
 
   // ── Tick timer ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -136,7 +131,7 @@ export function ArticlePage() {
       t={t}
       categorySentimentDistribution={categorySentimentDistribution}
       categoryArticles={categoryArticles}
-      categoryTrendingKeywords={categoryTrendingKeywords}
+      categoryTrendingKeywords={trendingKeywords ?? []}
       categoryLiveEngagement={categoryLiveEngagement}
     />
   );
@@ -150,7 +145,8 @@ export function ArticlePage() {
       </motion.div>
 
       <div className="lg:flex gap-6">
-        {/* Article content */}
+        {/* Article content — exactly the Home centre column: uncapped, takes
+            whatever the right rail (max 560px) leaves over. */}
         <div className="flex-1 min-w-0 pb-10">
           <div className="mb-5">
             <LanguageSwitcher isDark={isDark} isLoading={tr.isLoading} isAutoTranslated={tr.isAutoTranslated} />
@@ -162,8 +158,8 @@ export function ArticlePage() {
           </motion.article>
         </div>
 
-        {/* Sidebar — desktop */}
-        <div className="hidden lg:block w-80 shrink-0">
+        {/* Sidebar — desktop: grows to the right edge like the Home rail */}
+        <div className="hidden lg:block flex-1 min-w-[300px] max-w-[560px]">
           <motion.aside
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}

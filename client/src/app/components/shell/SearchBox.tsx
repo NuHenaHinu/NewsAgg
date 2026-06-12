@@ -15,7 +15,7 @@ export function SearchBox() {
   return (
     <div
       className={`flex items-center gap-2 rounded-full px-4 py-2.5 border transition-all
-        focus-within:ring-2 focus-within:ring-[var(--accent,#6366f1)]/50
+        focus-within:ring-2 focus-within:ring-[var(--brand-ring,rgba(6,182,212,0.5))]
         ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}
     >
       <Search size={16} className={isDark ? 'text-slate-500' : 'text-slate-400'} />

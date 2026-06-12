@@ -5,15 +5,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useApp } from '../../contexts/AppContext';
 import { POSTS_ENABLED } from '../../constants';
 import { fetchDailyQuote, fetchQuoteList } from '../../services/quoteService';
+import { usePosts } from '../../hooks/usePosts';
 import { QuoteCard } from './QuoteCard';
+import { PostCard } from './PostCard';
 
 const RAIL_QUOTES = 8;
+const RAIL_POSTS = 12;
 
 /** "Posts beside the news": quote of the day pinned on top, then a feed that
- * interleaves user posts with FavQs quotes (every 5th slot is a quote). Until
- * the posts feature ships (POSTS_ENABLED), the feed is quotes-only and the
- * composer renders as a disabled teaser. */
-export function PulseRail({ postCards = [] }: { postCards?: ReactNode[] }) {
+ * interleaves user posts with FavQs quotes (every 5th slot is a quote). With
+ * no posts yet the feed degrades to a quotes-only list. */
+export function PulseRail() {
   const { t, isDark, isAuthenticated, setSidebarOpen } = useApp();
 
   const { data: daily } = useQuery({
@@ -26,6 +28,11 @@ export function PulseRail({ postCards = [] }: { postCards?: ReactNode[] }) {
     queryFn: fetchQuoteList,
     staleTime: 60 * 60 * 1000,
   });
+  const { data: postsData } = usePosts({ pageSize: RAIL_POSTS });
+  const railPosts = POSTS_ENABLED ? (postsData?.pages[0]?.posts ?? []) : [];
+  const postCards: ReactNode[] = railPosts.map((post) => (
+    <PostCard key={`p-${post.id}`} post={post} />
+  ));
 
   // Deterministic interleave: after every 4 posts comes 1 quote, drawn
   // round-robin from the daily batch. With no posts yet the feed degrades to
@@ -64,12 +71,12 @@ export function PulseRail({ postCards = [] }: { postCards?: ReactNode[] }) {
       {POSTS_ENABLED ? (
         isAuthenticated ? (
           <Link to="/posts?compose=1" className={teaserClasses}>
-            <PenSquare size={16} className="shrink-0 text-[var(--accent,#6366f1)]" />
+            <PenSquare size={16} className="shrink-0 text-[var(--brand,#06b6d4)]" />
             {t.whatsHappening}
           </Link>
         ) : (
           <button onClick={() => setSidebarOpen(true)} className={teaserClasses}>
-            <PenSquare size={16} className="shrink-0 text-[var(--accent,#6366f1)]" />
+            <PenSquare size={16} className="shrink-0 text-[var(--brand,#06b6d4)]" />
             {t.signInToPost}
           </button>
         )
@@ -85,7 +92,7 @@ export function PulseRail({ postCards = [] }: { postCards?: ReactNode[] }) {
       {POSTS_ENABLED && (
         <Link
           to="/posts"
-          className="text-sm font-medium px-2 py-1 text-[var(--accent,#6366f1)] hover:underline"
+          className="text-sm font-medium px-2 py-1 text-[var(--brand,#06b6d4)] hover:underline"
         >
           {t.viewAllPosts}
         </Link>

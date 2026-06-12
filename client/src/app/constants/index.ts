@@ -1,7 +1,6 @@
-/** Feature flag: the posts/quotes social feed (F7). The shell ships with the
- * rail in quotes-only mode; flipping this lights up composer, /posts page and
- * nav tabs once the backend lands. */
-export const POSTS_ENABLED = false;
+/** Feature flag: the posts/quotes social feed (F7). Backend + UI landed —
+ * composer, /posts page, nav tabs and the interleaved Pulse rail are live. */
+export const POSTS_ENABLED = true;
 
 export const CATEGORIES = [
   'sport',

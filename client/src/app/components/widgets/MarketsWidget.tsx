@@ -68,7 +68,7 @@ export function MarketsWidget() {
       <div className="flex items-center gap-2 mb-2">
         <div
           className="w-6 h-6 rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--accent, #6366f1)' }}
+          style={{ background: 'var(--brand-grad, #06b6d4)' }}
         >
           <LineChartIcon size={13} className="text-white" />
         </div>

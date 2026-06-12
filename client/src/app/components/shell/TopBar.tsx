@@ -16,7 +16,7 @@ export function TopBar() {
       <Link to="/" className="shrink-0">
         <span
           className="w-8 h-8 rounded-lg flex items-center justify-center font-poppins font-bold text-white"
-          style={{ background: 'var(--accent, #6366f1)' }}
+          style={{ background: 'var(--brand-grad, #06b6d4)' }}
         >
           N
         </span>
